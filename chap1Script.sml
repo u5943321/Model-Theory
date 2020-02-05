@@ -187,13 +187,45 @@ QED
 
 Definition sen_def:
   sen ϕ <=> FV ϕ = {}
-End          
+End
 
+        
+(*
 Definition elem_equiv_def:
 elem_equiv L M N <=> struc L M /\ struc L N /\
                      (!ϕ v. L_form L ϕ /\ sen ϕ /\ valuation M v ==>
                             satis M v ϕ = satis N v ϕ)       
 End  
-           
+*)
+                
+Definition L_theory_def:
+  L_theory L TH <=> !ϕ. ϕ IN TH ==> L_form L ϕ /\ sen ϕ
+End
 
+Definition satisfiable_def:
+  satisfiable L TH (:α) <=> L_theory L TH /\
+                            ?M:α model. struc L M /\
+                                        (!ϕ v. valuation M v /\ ϕ IN TH ==>
+                                               satis M v ϕ)
+End
+
+Definition fin_satisfiable_def:
+  fin_satisfiable L TH (:α) <=> !TH0. TH0 ⊆ TH /\ FINITE TH0 ==>
+                                      satisfiable L TH (:α)
+End                                             
+        
+Definition log_cons_def:
+  log_cons L TH ϕ (:α) <=> L_theory L TH /\ L_form L ϕ /\ sen ϕ /\
+                           (!M:α model v. struc L M /\ valuation M v /\
+                            (!ψ. ψ IN TH ==> satis M v ψ) ==>
+                            satis M v ϕ)
+End
+
+Definition cons_def:
+  cons L Δ ψ (:α) <=> (!ϕ. ϕ IN Δ ==> L_form L ϕ) /\ L_form L ψ /\
+                      (!M:α model v. struc L M /\ valuation M v /\
+                            (!ϕ. ϕ IN Δ ==> satis M v ϕ) ==>
+                            satis M v ψ)
+End                                          
+        
 val _ = export_theory();
