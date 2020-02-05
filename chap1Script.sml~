@@ -1,0 +1,13 @@
+open HolKernel Parse boolLib bossLib;
+open nlistTheory listTheory;
+open pred_setTheory;
+open folModelsTheory;
+open folLangTheory;
+
+val _ = new_theory "chap1";
+
+Definition L_structure: 
+  L_structure L M = T
+End
+
+val _ = export_theory();
