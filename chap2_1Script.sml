@@ -64,10 +64,10 @@ End
 
 Definition sim_const_def:
   sim_const L TH (:α) c d <=> L_with_eq L (:α) /\
-                              L.Fun_sym c 0 /\ L.Fun_sym d 0 /\ L_theory L TH /\
-                              log_cons L TH (Pred 0 [Fn c [];Fn d []]) (:α) 
+                         L.Fun_sym c 0 /\ L.Fun_sym d 0 /\ L_theory L TH /\
+                         (Pred 0 [Fn c [];Fn d []]) IN TH
 End
-
+(*
 Theorem sim_const_IN_TH:
   L_with_eq L (:α) /\ sim_const L TH (:α) c d /\ maxi L TH /\ fin_satisfiable L TH (:α) ==>
   Pred 0 [Fn c []; Fn d []] ∈ TH
@@ -84,52 +84,54 @@ rw[] >> SPOSE_NOT_THEN ASSUME_TAC >>
 ‘’
 irule lemma_2_1_6 >> rw[sen_def,form_predicates] >>
 map_every qexists_tac [‘L’,‘’]
-                                                     
+*)                                                     
 
 Theorem lemma_2_1_7_claim_1:
-  L_with_eq L (:α) /\ L_theory L TH ==>
+  L_with_eq L (:α) /\ L_theory L TH /\
+  maxi L TH /\ fin_satisfiable L TH (:α) ==>
   (sim_const L TH (:α)) equiv_on {c | L.Fun_sym c 0}
 Proof     
 rw[equiv_on_def] (* 3 *)
->- (rw[sim_const_def,log_cons_def,cons_def,sen_def,FV_def] (* 3 *)
-   >- fs[L_theory_def]
-   >- fs[L_with_eq_def,L_form_def,form_predicates]
-   >- (fs[L_with_eq_def,satis_def,holds_def] >> fs[struc_def]))
->- (rw[sim_const_def,log_cons_def,cons_def,satis_def] >>
-    ‘L_form L (Pred 0 [Fn x []; Fn y []]) /\
-     L_form L (Pred 0 [Fn y []; Fn x []])’
-      by
-       (fs[L_with_eq_def,L_form_def,form_predicates] >> metis_tac[]) >>
-    rw[] >>
-    ‘sen (Pred 0 [Fn x []; Fn y []]) /\ sen (Pred 0 [Fn y []; Fn x []])’
-      by rw[sen_def,FV_def] >>
-    rw[] >>
-    ‘∀ϕ. ϕ ∈ TH ⇒ L_form L ϕ’
-      by fs[L_theory_def] >>
-    rw[] >>
-    ‘∀M v. struc L M ∧ valuation M v ∧
-           (∀ϕ. ϕ ∈ TH ⇒ valuation M v ∧ holds M v ϕ) ⇒
-           holds M v (Pred 0 [Fn x []; Fn y []]) =
-           holds M v (Pred 0 [Fn y []; Fn x []])’
-      suffices_by metis_tac[] >>
-    rw[] >> rw[holds_def] >> fs[L_with_eq_def] >> metis_tac[])
->- (fs[sim_const_def,log_cons_def,cons_def,satis_def,sen_def,
-      holds_def] >>
-   ‘L_form L (Pred 0 [Fn x []; Fn z []])’
-     by
-      (fs[L_form_def,form_predicates,form_functions_def] >> metis_tac[]) >>
-   rw[] >> fs[L_with_eq_def] >> rw[] (* 3 *)
-   >- fs[struc_def] >- fs[struc_def] >>
-   ‘M.Fun x [] = M.Fun y [] /\ M.Fun y [] = M.Fun z []’
-     suffices_by metis_tac[] >>
-   rw[] (* 2 *)
-   >- (‘struc L M ∧ valuation M v ∧
-       (∀ϕ. ϕ ∈ TH ⇒ valuation M v ∧ holds M v ϕ) ⇒
-       M.Fun x [] ∈ M.Dom ∧ M.Fun y [] ∈ M.Dom’ suffices_by metis_tac[] >>
-      rw[] (* 2 *) >> fs[struc_def]) >>
-   metis_tac[])
+>- (rw[sim_const_def] >> irule lemma_2_1_6 >> rw[sen_def,form_predicates] >>
+   map_every qexists_tac [‘L’,‘{}’] >> rw[cons_def,satis_def,holds_def] (* 2 *)
+   >- fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+   fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+   fs[struc_def])
+>- (rw[sim_const_def,EQ_IMP_THM] (* 2 *)
+   >- (irule lemma_2_1_6 >> rw[sen_def,form_predicates] >>
+       map_every qexists_tac [‘L’,‘{Pred 0 [Fn x []; Fn y []]}’] >>
+       rw[cons_def,satis_def,holds_def] (* 3 *)
+       >- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+          metis_tac[])
+       >- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+          metis_tac[]) >>
+       fs[L_with_eq_def] >> metis_tac[]) >>
+   irule lemma_2_1_6 >> rw[sen_def,form_predicates] >>
+   map_every qexists_tac [‘L’,‘{Pred 0 [Fn y []; Fn x []]}’] >>
+   rw[cons_def,satis_def,holds_def] (* 3 *)
+   >- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+       metis_tac[])
+   >- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+       metis_tac[]) >>
+   fs[L_with_eq_def] >> metis_tac[]) >>
+rw[sim_const_def] >> irule lemma_2_1_6 >> rw[sen_def,form_predicates] >>
+map_every qexists_tac
+[‘L’,‘{Pred 0 [Fn x []; Fn y []]; Pred 0 [Fn y []; Fn z []]}’] >>
+rw[cons_def,satis_def,holds_def] (* 6 *)
+>- fs[sim_const_def] 
+>- fs[sim_const_def]
+>- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+    metis_tac[])
+>- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+    metis_tac[])
+>- (fs[L_form_def,form_predicates,form_functions_def,L_with_eq_def] >>
+    metis_tac[]) >>
+‘holds M v (Pred 0 [Fn x []; Fn y []]) /\ holds M v (Pred 0 [Fn y []; Fn z []])’  by metis_tac[] >>
+fs[holds_def,L_with_eq_def] >> metis_tac[]     
 QED
 
+Theorem maxi_fin_satisfiable_IN_theory:
+  maxi L TH /\ fin_satisfiable L TH (:α) /\        
           
 Theorem lemma_2_1_7:
   maxi L TH /\ fin_satisfiable L TH (:α) /\ wit_prop L TH (:α) ==>
