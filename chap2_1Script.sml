@@ -130,8 +130,57 @@ rw[cons_def,satis_def,holds_def] (* 6 *)
 fs[holds_def,L_with_eq_def] >> metis_tac[]     
 QED
 
-Theorem maxi_fin_satisfiable_IN_theory:
-  maxi L TH /\ fin_satisfiable L TH (:α) /\        
+Theorem lemma_2_1_7_claim_2:
+  L_with_eq L (:α) /\ L.Pred_sym r nr /\ LENGTH cs = nr /\ LENGTH ds = nr /\
+  L_theory L TH /\ maxi L TH /\ fin_satisfiable L TH (:α) /\
+  (!n. n < nr ==> sim_const L TH (:α) (EL n cs) (EL n ds)) ==>
+  ((Pred r (MAP (\a. Fn a []) cs)) IN TH <=>    
+   (Pred r (MAP (\a. Fn a []) ds)) IN TH)
+Proof
+rw[EQ_IMP_THM] (* 2 *)
+>- irule lemma_2_1_6 >>
+   rw[sen_def,form_predicates,FVT_def,LIST_UNION_def,MAP_MAP_o] (* 2 *)
+   >- (SPOSE_NOT_THEN ASSUME_TAC >> fs[GSYM MEMBER_NOT_EMPTY,MEM_MAP] >> 
+       metis_tac[MEMBER_NOT_EMPTY]) >>
+   qexists_tac ‘L’ >>
+   qexists_tac ‘((Pred r (MAP (λa. Fn a []) cs)) INSERT 
+                  {Pred 0 [Fn (EL n cs) [] ; Fn (EL n ds) []] | n | n < LENGTH ds})’ >>
+   rw[cons_def,satis_def,holds_def] (* 6 *)
+   >- (qabbrev_tac
+        ‘eqs = {Pred 0 [Fn (EL n cs) []; Fn (EL n ds) []] |n| n < LENGTH ds}’ >>
+      ‘?f s0:num -> bool. FINITE s0 /\ eqs = IMAGE f s0’
+         suffices_by metis_tac[IMAGE_FINITE]>>
+      map_every qexists_tac
+        [‘\n. (Pred 0 [Fn (EL n cs) []; Fn (EL n ds) []])’,
+         ‘{n | n < LENGTH ds}’] >>
+      rw[] (* 2 *)
+      >- (‘FINITE (count (LENGTH ds))’ by metis_tac[FINITE_COUNT] >>
+         ‘(count (LENGTH ds)) = {n | n < LENGTH ds}’ by rw[count_def] >>
+         metis_tac[]) >>
+      rw[Abbr‘eqs’,EXTENSION,IMAGE_DEF])
+   >- (fs[sim_const_def] >> rw[SUBSET_DEF] >> metis_tac[])
+   >- (rw[L_form_def,form_predicates,form_functions_def] >>
+      fs[MEM_MAP] >> rw[] >> fs[term_functions_def] >> rw[] >>
+      fs[L_theory_def,L_form_def] >> first_x_assum drule >> rw[] >>
+      first_x_assum irule >> qexists_tac ‘{(a,0)}’ >> rw[MAP_MAP_o,MEM_MAP] >>
+      rw[PULL_EXISTS])
+   >- (rw[L_form_def,form_predicates,form_functions_def] >>
+      fs[MEM_MAP] >> rw[] >> fs[term_functions_def] >> rw[] (* 3 *) >>
+      fs[sim_const_def,L_with_eq_def])
+   >- (rw[L_form_def,form_predicates,form_functions_def] >>
+      fs[MEM_MAP,MAP_MAP_o] >> rw[] >> fs[sim_const_def] >> rw[] >>
+      fs[MEM_EL]) >>
+   ‘M.Pred r (MAP (termval M v) (MAP (λa. Fn a []) cs)) /\
+   (MAP (termval M v) (MAP (λa. Fn a []) cs) =
+    MAP (termval M v) (MAP (λa. Fn a []) ds))’
+      suffices_by metis_tac[] >>
+   strip_tac (* 2 *)
+   >- (‘holds M v (Pred r (MAP (λa. Fn a []) cs))’ by metis_tac[] >>
+      fs[holds_def]) >>
+   rw[MAP_MAP_o,LIST_EQ_REWRITE,EL_MAP] >>
+   ‘holds M v (Pred 0 [Fn (EL x cs) []; Fn (EL x ds) []])’
+     by metis_tac[] >>
+   fs[holds_def,L_with_eq_def] >> metis_tac[]
           
 Theorem lemma_2_1_7:
   maxi L TH /\ fin_satisfiable L TH (:α) /\ wit_prop L TH (:α) ==>
