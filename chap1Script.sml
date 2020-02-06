@@ -205,27 +205,35 @@ End
 Definition satisfiable_def:
   satisfiable L TH (:α) <=> L_theory L TH /\
                             ?M:α model. struc L M /\
-                                        (!ϕ v. valuation M v /\ ϕ IN TH ==>
-                                               satis M v ϕ)
+                                        (!v. valuation M v ==>
+                                          (!ϕ. ϕ IN TH ==> satis M v ϕ))
 End
 
 Definition fin_satisfiable_def:
   fin_satisfiable L TH (:α) <=> !TH0. TH0 ⊆ TH /\ FINITE TH0 ==>
-                                      satisfiable L TH (:α)
+                                      satisfiable L TH0 (:α)
 End                                             
-        
+
+(*                                                
 Definition log_cons_def:
   log_cons L TH ϕ (:α) <=> L_theory L TH /\ L_form L ϕ /\ sen ϕ /\
                            (!M:α model v. struc L M /\ valuation M v /\
                             (!ψ. ψ IN TH ==> satis M v ψ) ==>
                             satis M v ϕ)
 End
+*)
 
 Definition cons_def:
   cons L Δ ψ (:α) <=> (!ϕ. ϕ IN Δ ==> L_form L ϕ) /\ L_form L ψ /\
                       (!M:α model v. struc L M /\ valuation M v /\
                             (!ϕ. ϕ IN Δ ==> satis M v ϕ) ==>
                             satis M v ψ)
-End                                          
+End
+
+Definition log_cons_def:
+  log_cons L TH ϕ (:α) <=> cons L TH ϕ (:α) /\ L_theory L TH /\ sen ϕ 
+End
+        
+                                          
         
 val _ = export_theory();
