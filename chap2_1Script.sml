@@ -226,6 +226,34 @@ rw[MAP_MAP_o,LIST_EQ_REWRITE,EL_MAP] >>
   by metis_tac[] >>
 fs[holds_def,L_with_eq_def] >> metis_tac[]
 QED
+
+Definition rep_list_def:
+  rep_list rs l <=> LENGTH rs = LENGTH l /\ 
+                    (!n. n < LENGTH l ==> (EL n rs) IN (EL n l))
+End
+
+        
+
+Definition mfw_model_def:
+  mfw_model L TH (:α) =
+  <| Dom := (partition (sim_const L TH (:α)) {c | L.Fun_sym c 0});
+     Fun := (\f l:(num -> bool) list.
+              {d | ?cs: num list. rep_list cs l /\
+                        (Pred 0 [Fn f (MAP (\a. Fn a []) cs);Fn d []]) IN TH});
+     Pred := (\r l.
+               ?cs. rep_list cs l /\
+                    (Pred r (MAP (\a. Fn a []) cs) IN TH)) |>                   
+End                    
+(*
+Definition mfw_model_def:
+  mfw_model L T TH (:α) =
+  <| Dom := partition (sim_const L TH (:α)) {c | L.Fun_sym c 0};
+     Fun := \f l. {a | ?cs:num list. rep_list cs l /\ (Pred 0 [a;a]) IN TH};
+     Pred := \r l. T |>
+End                    
+*)
+                       
+        
           
 Theorem lemma_2_1_7:
   maxi L TH /\ fin_satisfiable L TH (:α) /\ wit_prop L TH (:α) ==>
